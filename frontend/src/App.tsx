@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NewOrderForm } from './components/NewOrderForm';
 import { TemperatureWidget } from './components/TemperatureWidget';
+import { RfidLogin } from './components/RfidLogin';
 
 interface ProductionOrder {
   id: number;
@@ -15,10 +16,17 @@ interface ProductionOrder {
   updatedAt: string;
 }
 
+interface Operator {
+  id: number;
+  firstName: string;
+  lastName: string;
+}
+
 function App() {
   const [orders, setOrders] = useState<ProductionOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [currentOperator, setCurrentOperator] = useState<Operator | null>(null);
 
   const fetchOrders = () => {
     setLoading(true);
@@ -59,6 +67,10 @@ function App() {
   };
 
   const handleStart = async (id: number) => {
+    if (!currentOperator) {
+      alert('Najpierw zaloguj się przez RFID!');
+      return;
+    }
     await fetch(`http://localhost:3001/orders/${id}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -68,6 +80,10 @@ function App() {
   };
 
   const handleStop = async (id: number) => {
+    if (!currentOperator) {
+      alert('Najpierw zaloguj się przez RFID!');
+      return;
+    }
     await fetch(`http://localhost:3001/orders/${id}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -83,14 +99,32 @@ function App() {
     <div className="min-h-screen bg-gray-50">
       {/* Nagłówek */}
       <header className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <h1 className="text-2xl font-bold text-gray-900">OptimaticMES</h1>
-          <p className="text-sm text-gray-500">System zarządzania produkcją</p>
+        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">OptimaticMES</h1>
+            <p className="text-sm text-gray-500">System zarządzania produkcją</p>
+          </div>
+          {currentOperator && (
+            <div className="flex items-center gap-2 bg-green-100 px-3 py-1 rounded-full">
+              <span className="text-green-800 text-sm font-medium">
+                👤 {currentOperator.firstName} {currentOperator.lastName}
+              </span>
+              <button
+                onClick={() => setCurrentOperator(null)}
+                className="text-green-600 hover:text-green-800 text-xs"
+              >
+                Wyloguj
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
       {/* Główna zawartość */}
       <main className="max-w-6xl mx-auto px-6 py-8">
+        {/* Logowanie RFID */}
+        {!currentOperator && <RfidLogin onLogin={setCurrentOperator} />}
+
         {/* Widżet temperatury */}
         <TemperatureWidget />
 

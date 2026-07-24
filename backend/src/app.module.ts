@@ -3,8 +3,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductionOrder } from './entities/production-order.entity';
 import { SensorData } from './entities/sensor-data.entity';
+import { Operator } from './entities/operator.entity';
+import { OperatorSession } from './entities/operator-session.entity';
 import { OrdersModule } from './orders/orders.module';
 import { SensorsModule } from './sensors/sensors.module';
+import { OperatorsModule } from './operators/operators.module';
 
 @Module({
   imports: [
@@ -18,14 +21,15 @@ import { SensorsModule } from './sensors/sensors.module';
         username: configService.get('DATABASE_USERNAME'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [ProductionOrder, SensorData],
+        entities: [ProductionOrder, SensorData, Operator, OperatorSession],
         synchronize: true,
-        logging: false, // wyłączamy logi SQL żeby nie zaśmiecały konsoli
+        logging: false,
       }),
       inject: [ConfigService],
     }),
     OrdersModule,
     SensorsModule,
+    OperatorsModule,
   ],
 })
 export class AppModule {}
