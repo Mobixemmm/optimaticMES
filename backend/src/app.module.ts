@@ -5,9 +5,11 @@ import { ProductionOrder } from './entities/production-order.entity';
 import { SensorData } from './entities/sensor-data.entity';
 import { Operator } from './entities/operator.entity';
 import { OperatorSession } from './entities/operator-session.entity';
+import { MachineData } from './entities/machine-data.entity';
 import { OrdersModule } from './orders/orders.module';
 import { SensorsModule } from './sensors/sensors.module';
 import { OperatorsModule } from './operators/operators.module';
+import { MachineDataModule } from './machine-data/machine-data.module';
 
 @Module({
   imports: [
@@ -21,8 +23,8 @@ import { OperatorsModule } from './operators/operators.module';
         username: configService.get('DATABASE_USERNAME'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [ProductionOrder, SensorData, Operator, OperatorSession],
-        synchronize: true,
+        entities: [ProductionOrder, SensorData, Operator, OperatorSession, MachineData],
+        synchronize: false, // WAŻNE: nie modyfikujemy istniejącej tabeli TimescaleDB
         logging: false,
       }),
       inject: [ConfigService],
@@ -30,6 +32,7 @@ import { OperatorsModule } from './operators/operators.module';
     OrdersModule,
     SensorsModule,
     OperatorsModule,
+    MachineDataModule,
   ],
 })
 export class AppModule {}

@@ -1,20 +1,6 @@
-import { useState, useEffect } from 'react';
-import { NewOrderForm } from './components/NewOrderForm';
-import { TemperatureWidget } from './components/TemperatureWidget';
+import { useState } from 'react';
+import { MachineDashboard } from './components/MachineDashboard';
 import { RfidLogin } from './components/RfidLogin';
-
-interface ProductionOrder {
-  id: number;
-  orderNumber: string;
-  productName: string;
-  quantity: number;
-  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
-  plannedStart: string | null;
-  actualStart: string | null;
-  actualEnd: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
 
 interface Operator {
   id: number;
@@ -23,163 +9,91 @@ interface Operator {
 }
 
 function App() {
-  const [orders, setOrders] = useState<ProductionOrder[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [currentOperator, setCurrentOperator] = useState<Operator | null>(null);
 
-  const fetchOrders = () => {
-    setLoading(true);
-    fetch('http://localhost:3001/orders')
-      .then(res => res.json())
-      .then(data => {
-        setOrders(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError('Błąd pobierania danych: ' + err.message);
-        setLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      pending: 'Oczekujące',
-      in_progress: 'W trakcie',
-      completed: 'Zakończone',
-      cancelled: 'Anulowane',
-    };
-    return labels[status] || status;
-  };
-
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      pending: 'bg-gray-100 text-gray-800',
-      in_progress: 'bg-blue-100 text-blue-800',
-      completed: 'bg-green-100 text-green-800',
-      cancelled: 'bg-red-100 text-red-800',
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800';
-  };
-
-  const handleStart = async (id: number) => {
-    if (!currentOperator) {
-      alert('Najpierw zaloguj się przez RFID!');
-      return;
-    }
-    await fetch(`http://localhost:3001/orders/${id}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'in_progress' }),
-    });
-    fetchOrders();
-  };
-
-  const handleStop = async (id: number) => {
-    if (!currentOperator) {
-      alert('Najpierw zaloguj się przez RFID!');
-      return;
-    }
-    await fetch(`http://localhost:3001/orders/${id}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'completed' }),
-    });
-    fetchOrders();
-  };
-
-  if (loading) return <div className="p-8 text-center">Ładowanie...</div>;
-  if (error) return <div className="p-8 text-center text-red-600">{error}</div>;
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Nagłówek */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">OptimaticMES</h1>
-            <p className="text-sm text-gray-500">System zarządzania produkcją</p>
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <aside className="w-56 bg-white border-r border-gray-200 p-5 flex flex-col gap-1">
+        <div className="flex items-center gap-3 font-semibold text-lg mb-6 px-2">
+          <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <circle cx="12" cy="12" r="10"/>
+              <circle cx="12" cy="12" r="3" fill="currentColor"/>
+            </svg>
           </div>
-          {currentOperator && (
-            <div className="flex items-center gap-2 bg-green-100 px-3 py-1 rounded-full">
-              <span className="text-green-800 text-sm font-medium">
-                👤 {currentOperator.firstName} {currentOperator.lastName}
-              </span>
-              <button
-                onClick={() => setCurrentOperator(null)}
-                className="text-green-600 hover:text-green-800 text-xs"
-              >
-                Wyloguj
-              </button>
-            </div>
-          )}
+          OptimaticMES
         </div>
-      </header>
 
-      {/* Główna zawartość */}
-      <main className="max-w-6xl mx-auto px-6 py-8">
+        <div className="text-xs font-medium text-gray-400 uppercase tracking-wider px-2 mb-2">Menu</div>
+        <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-emerald-50 text-emerald-700 font-medium text-sm relative">
+          <div className="absolute left-0 top-2 bottom-2 w-0.5 bg-emerald-600 rounded-r" />
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </div>
+        <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 hover:bg-gray-50 text-sm cursor-pointer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          Zlecenia
+          <span className="ml-auto bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-md font-medium">12+</span>
+        </div>
+        <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 hover:bg-gray-50 text-sm cursor-pointer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Kalendarz
+        </div>
+        <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 hover:bg-gray-50 text-sm cursor-pointer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Analityka
+        </div>
+        <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 hover:bg-gray-50 text-sm cursor-pointer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Operatorzy
+        </div>
+
+        <div className="mt-auto bg-emerald-900 rounded-xl p-4 text-white mt-6">
+          <div className="text-sm font-medium mb-1">Pobierz raport OEE</div>
+          <div className="text-xs opacity-70 mb-3">Eksportuj dane do PDF</div>
+          <button className="w-full py-2 bg-emerald-600 rounded-lg text-sm font-medium">Pobierz</button>
+        </div>
+      </aside>
+
+      {/* Main */}
+      <main className="flex-1 p-6 overflow-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-lg px-4 py-2.5 w-80">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Wyszukaj maszynę lub zlecenie..." className="outline-none text-sm w-full bg-transparent" />
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            </button>
+            {currentOperator ? (
+              <div className="flex items-center gap-2 bg-green-100 px-3 py-1.5 rounded-full">
+                <span className="text-green-800 text-sm font-medium">👤 {currentOperator.firstName} {currentOperator.lastName}</span>
+                <button onClick={() => setCurrentOperator(null)} className="text-green-600 hover:text-green-800 text-xs">Wyloguj</button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-600">?</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Hero */}
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Dashboard produkcji</h1>
+            <p className="text-sm text-gray-500 mt-1">Monitorowanie maszyn lotniskowych w czasie rzeczywistym.</p>
+          </div>
+        </div>
+
         {/* Logowanie RFID */}
         {!currentOperator && <RfidLogin onLogin={setCurrentOperator} />}
 
-        {/* Widżet temperatury */}
-        <TemperatureWidget />
-
-        {/* Formularz nowego zlecenia */}
-        <NewOrderForm onOrderCreated={fetchOrders} />
-
-        {/* Tabela zleceń */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">Nr zlecenia</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">Produkt</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">Ilość</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">Status</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">Akcje</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {orders.map((order) => (
-                <tr key={order.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium">{order.orderNumber}</td>
-                  <td className="px-4 py-3">{order.productName}</td>
-                  <td className="px-4 py-3">{order.quantity}</td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                      {getStatusLabel(order.status)}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    {order.status === 'pending' && (
-                      <button
-                        onClick={() => handleStart(order.id)}
-                        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-                      >
-                        START
-                      </button>
-                    )}
-                    {order.status === 'in_progress' && (
-                      <button
-                        onClick={() => handleStop(order.id)}
-                        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
-                      >
-                        STOP
-                      </button>
-                    )}
-                    {order.status === 'completed' && (
-                      <span className="text-gray-400 text-sm">Zakończone</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {/* Machine Dashboard */}
+        <MachineDashboard />
       </main>
     </div>
   );
