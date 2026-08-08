@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { AppModule } from './app.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AndonAlert } from './entities/andon-alert.entity';
+import { ensureDemoMachines } from './seed-demo-machines';
 
 function minutesAgo(minutes: number): Date {
   return new Date(Date.now() - minutes * 60 * 1000);
@@ -49,6 +50,9 @@ async function bootstrap() {
   if (existingCount > 0) {
     console.log('ℹ️ Alerty Andon już istnieją w bazie — pomijam seed.');
   } else {
+    // Alert wskazuje maszynę kluczem obcym, więc rejestr musi ją znać wcześniej.
+    await ensureDemoMachines(app, alerts.map((a) => a.machineId));
+
     for (const alert of alerts) {
       await andonRepo.save(alert);
       console.log(`✅ Dodano alert Andon: ${alert.type} — ${alert.message}`);

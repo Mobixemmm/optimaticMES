@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { AppModule } from './app.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { MachineStopEvent, StopReason } from './entities/machine-stop-event.entity';
+import { ensureDemoMachines } from './seed-demo-machines';
 
 function daysAgoAt(daysAgo: number, hour: number, minute = 0): Date {
   const d = new Date();
@@ -71,6 +72,10 @@ async function bootstrap() {
     { machine: 'Linia LN-12', reason: 'material', startFailure: daysAgoAt(8, 14), endFailure: plusMinutes(daysAgoAt(8, 14), 55) },
     { machine: 'Linia LN-12', reason: 'setup', startFailure: daysAgoAt(14, 8), endFailure: plusMinutes(daysAgoAt(14, 8), 42) },
   ];
+
+  // Kolejność jest teraz wymuszona przez klucz obcy: najpierw maszyna w
+  // rejestrze, dopiero potem jej przestoje.
+  await ensureDemoMachines(app, stops.map((s) => s.machine));
 
   for (const stop of stops) {
     await stopRepo.save(stop);

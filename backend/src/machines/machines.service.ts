@@ -1,4 +1,10 @@
-import { Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Machine } from '../entities/machine.entity';
@@ -12,6 +18,9 @@ import {
   tenantScope,
   assertSiteAllowed,
 } from '../common/request-context';
+
+// Naruszenie klucza obcego w PostgreSQL.
+const PG_FOREIGN_KEY_VIOLATION = '23503';
 
 @Injectable()
 export class MachinesService implements OnModuleInit {
@@ -142,6 +151,17 @@ export class MachinesService implements OnModuleInit {
 
   async remove(id: number): Promise<void> {
     const machine = await this.findOne(id);
-    await this.machineRepository.remove(machine);
+    try {
+      await this.machineRepository.remove(machine);
+    } catch (error) {
+      // Odkąd przestoje, odrzut i zlecenia mają FK do `machines`, baza nie
+      // pozwoli skasować maszyny z historią produkcyjną (ON DELETE RESTRICT).
+      // To jest zamierzone — ale bez tego przechwycenia operator dostawał
+      // surowe 500 zamiast informacji, co zrobić zamiast kasowania.
+      if ((error as { code?: string })?.code !== PG_FOREIGN_KEY_VIOLATION) throw error;
+      throw new ConflictException(
+        `Maszyna ${machine.machineId} ma zapisaną historię produkcyjną (przestoje, odrzut lub zlecenia) i nie może zostać usunięta. Oznacz ją jako nieaktywną.`,
+      );
+    }
   }
 }
