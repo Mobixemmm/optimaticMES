@@ -37,4 +37,21 @@ export default tseslint.config(
     },
   },
   eslintPluginPrettier,
+  {
+    rules: {
+      "prettier/prettier": ["error", { endOfLine: "auto" }],
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
+  {
+    // shadcn/ui components are vendored: `shadcn add` regenerates them and
+    // overwrites local edits. Co-locating `cva` variants (buttonVariants,
+    // badgeVariants, toggleVariants) and hooks (useSidebar, useFormField) with
+    // the component is that generator's layout, so splitting them to satisfy
+    // Fast Refresh would break every import site and be undone on the next sync.
+    files: ["src/components/ui/**/*.{ts,tsx}"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
 );

@@ -9,50 +9,605 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardRouteImport } from './routes/_dashboard'
+import { Route as DashboardIndexRouteImport } from './routes/_dashboard.index'
+import { Route as DashboardAnalyticsRouteImport } from './routes/_dashboard.analytics'
+import { Route as DashboardAndonRouteImport } from './routes/_dashboard.andon'
+import { Route as DashboardBiRouteImport } from './routes/_dashboard.bi'
+import { Route as DashboardBomRouteImport } from './routes/_dashboard.bom'
+import { Route as DashboardEventsRouteImport } from './routes/_dashboard.events'
+import { Route as DashboardHistorianRouteImport } from './routes/_dashboard.historian'
+import { Route as DashboardInspectionsRouteImport } from './routes/_dashboard.inspections'
+import { Route as DashboardInstructionsRouteImport } from './routes/_dashboard.instructions'
+import { Route as DashboardIntegrationsRouteImport } from './routes/_dashboard.integrations'
+import { Route as DashboardInventoryRouteImport } from './routes/_dashboard.inventory'
+import { Route as DashboardMachinesRouteImport } from './routes/_dashboard.machines'
+import { Route as DashboardMaintenanceRouteImport } from './routes/_dashboard.maintenance'
+import { Route as DashboardNotificationsRouteImport } from './routes/_dashboard.notifications'
+import { Route as DashboardOperatorPanelRouteImport } from './routes/_dashboard.operator-panel'
+import { Route as DashboardOperatorsRouteImport } from './routes/_dashboard.operators'
+import { Route as DashboardOrdersRouteImport } from './routes/_dashboard.orders'
+import { Route as DashboardPlanningRouteImport } from './routes/_dashboard.planning'
+import { Route as DashboardQualityRouteImport } from './routes/_dashboard.quality'
+import { Route as DashboardSafetyCrossesRouteImport } from './routes/_dashboard.safety-crosses'
+import { Route as DashboardSchedulesRouteImport } from './routes/_dashboard.schedules'
+import { Route as DashboardScrapRouteImport } from './routes/_dashboard.scrap'
+import { Route as DashboardSettingsRouteImport } from './routes/_dashboard.settings'
+import { Route as DashboardSmartFactoryRouteImport } from './routes/_dashboard.smart-factory'
+import { Route as DashboardStepperRouteImport } from './routes/_dashboard.stepper'
+import { Route as DashboardTraceabilityRouteImport } from './routes/_dashboard.traceability'
 
-const IndexRoute = IndexRouteImport.update({
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/_dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAnalyticsRoute = DashboardAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAndonRoute = DashboardAndonRouteImport.update({
+  id: '/andon',
+  path: '/andon',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardBiRoute = DashboardBiRouteImport.update({
+  id: '/bi',
+  path: '/bi',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardBomRoute = DashboardBomRouteImport.update({
+  id: '/bom',
+  path: '/bom',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardEventsRoute = DashboardEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardHistorianRoute = DashboardHistorianRouteImport.update({
+  id: '/historian',
+  path: '/historian',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardInspectionsRoute = DashboardInspectionsRouteImport.update({
+  id: '/inspections',
+  path: '/inspections',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardInstructionsRoute = DashboardInstructionsRouteImport.update({
+  id: '/instructions',
+  path: '/instructions',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardIntegrationsRoute = DashboardIntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardInventoryRoute = DashboardInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardMachinesRoute = DashboardMachinesRouteImport.update({
+  id: '/machines',
+  path: '/machines',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardMaintenanceRoute = DashboardMaintenanceRouteImport.update({
+  id: '/maintenance',
+  path: '/maintenance',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardNotificationsRoute = DashboardNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardOperatorPanelRoute = DashboardOperatorPanelRouteImport.update({
+  id: '/operator-panel',
+  path: '/operator-panel',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardOperatorsRoute = DashboardOperatorsRouteImport.update({
+  id: '/operators',
+  path: '/operators',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardOrdersRoute = DashboardOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardPlanningRoute = DashboardPlanningRouteImport.update({
+  id: '/planning',
+  path: '/planning',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardQualityRoute = DashboardQualityRouteImport.update({
+  id: '/quality',
+  path: '/quality',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSafetyCrossesRoute = DashboardSafetyCrossesRouteImport.update({
+  id: '/safety-crosses',
+  path: '/safety-crosses',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSchedulesRoute = DashboardSchedulesRouteImport.update({
+  id: '/schedules',
+  path: '/schedules',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardScrapRoute = DashboardScrapRouteImport.update({
+  id: '/scrap',
+  path: '/scrap',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSmartFactoryRoute = DashboardSmartFactoryRouteImport.update({
+  id: '/smart-factory',
+  path: '/smart-factory',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardStepperRoute = DashboardStepperRouteImport.update({
+  id: '/stepper',
+  path: '/stepper',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardTraceabilityRoute = DashboardTraceabilityRouteImport.update({
+  id: '/traceability',
+  path: '/traceability',
+  getParentRoute: () => DashboardRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof DashboardIndexRoute
+  '/analytics': typeof DashboardAnalyticsRoute
+  '/andon': typeof DashboardAndonRoute
+  '/bi': typeof DashboardBiRoute
+  '/bom': typeof DashboardBomRoute
+  '/events': typeof DashboardEventsRoute
+  '/historian': typeof DashboardHistorianRoute
+  '/inspections': typeof DashboardInspectionsRoute
+  '/instructions': typeof DashboardInstructionsRoute
+  '/integrations': typeof DashboardIntegrationsRoute
+  '/inventory': typeof DashboardInventoryRoute
+  '/machines': typeof DashboardMachinesRoute
+  '/maintenance': typeof DashboardMaintenanceRoute
+  '/notifications': typeof DashboardNotificationsRoute
+  '/operator-panel': typeof DashboardOperatorPanelRoute
+  '/operators': typeof DashboardOperatorsRoute
+  '/orders': typeof DashboardOrdersRoute
+  '/planning': typeof DashboardPlanningRoute
+  '/quality': typeof DashboardQualityRoute
+  '/safety-crosses': typeof DashboardSafetyCrossesRoute
+  '/schedules': typeof DashboardSchedulesRoute
+  '/scrap': typeof DashboardScrapRoute
+  '/settings': typeof DashboardSettingsRoute
+  '/smart-factory': typeof DashboardSmartFactoryRoute
+  '/stepper': typeof DashboardStepperRoute
+  '/traceability': typeof DashboardTraceabilityRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/analytics': typeof DashboardAnalyticsRoute
+  '/andon': typeof DashboardAndonRoute
+  '/bi': typeof DashboardBiRoute
+  '/bom': typeof DashboardBomRoute
+  '/events': typeof DashboardEventsRoute
+  '/historian': typeof DashboardHistorianRoute
+  '/inspections': typeof DashboardInspectionsRoute
+  '/instructions': typeof DashboardInstructionsRoute
+  '/integrations': typeof DashboardIntegrationsRoute
+  '/inventory': typeof DashboardInventoryRoute
+  '/machines': typeof DashboardMachinesRoute
+  '/maintenance': typeof DashboardMaintenanceRoute
+  '/notifications': typeof DashboardNotificationsRoute
+  '/operator-panel': typeof DashboardOperatorPanelRoute
+  '/operators': typeof DashboardOperatorsRoute
+  '/orders': typeof DashboardOrdersRoute
+  '/planning': typeof DashboardPlanningRoute
+  '/quality': typeof DashboardQualityRoute
+  '/safety-crosses': typeof DashboardSafetyCrossesRoute
+  '/schedules': typeof DashboardSchedulesRoute
+  '/scrap': typeof DashboardScrapRoute
+  '/settings': typeof DashboardSettingsRoute
+  '/smart-factory': typeof DashboardSmartFactoryRoute
+  '/stepper': typeof DashboardStepperRoute
+  '/traceability': typeof DashboardTraceabilityRoute
+  '/': typeof DashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_dashboard': typeof DashboardRouteWithChildren
+  '/_dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/_dashboard/andon': typeof DashboardAndonRoute
+  '/_dashboard/bi': typeof DashboardBiRoute
+  '/_dashboard/bom': typeof DashboardBomRoute
+  '/_dashboard/events': typeof DashboardEventsRoute
+  '/_dashboard/historian': typeof DashboardHistorianRoute
+  '/_dashboard/inspections': typeof DashboardInspectionsRoute
+  '/_dashboard/instructions': typeof DashboardInstructionsRoute
+  '/_dashboard/integrations': typeof DashboardIntegrationsRoute
+  '/_dashboard/inventory': typeof DashboardInventoryRoute
+  '/_dashboard/machines': typeof DashboardMachinesRoute
+  '/_dashboard/maintenance': typeof DashboardMaintenanceRoute
+  '/_dashboard/notifications': typeof DashboardNotificationsRoute
+  '/_dashboard/operator-panel': typeof DashboardOperatorPanelRoute
+  '/_dashboard/operators': typeof DashboardOperatorsRoute
+  '/_dashboard/orders': typeof DashboardOrdersRoute
+  '/_dashboard/planning': typeof DashboardPlanningRoute
+  '/_dashboard/quality': typeof DashboardQualityRoute
+  '/_dashboard/safety-crosses': typeof DashboardSafetyCrossesRoute
+  '/_dashboard/schedules': typeof DashboardSchedulesRoute
+  '/_dashboard/scrap': typeof DashboardScrapRoute
+  '/_dashboard/settings': typeof DashboardSettingsRoute
+  '/_dashboard/smart-factory': typeof DashboardSmartFactoryRoute
+  '/_dashboard/stepper': typeof DashboardStepperRoute
+  '/_dashboard/traceability': typeof DashboardTraceabilityRoute
+  '/_dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/analytics'
+    | '/andon'
+    | '/bi'
+    | '/bom'
+    | '/events'
+    | '/historian'
+    | '/inspections'
+    | '/instructions'
+    | '/integrations'
+    | '/inventory'
+    | '/machines'
+    | '/maintenance'
+    | '/notifications'
+    | '/operator-panel'
+    | '/operators'
+    | '/orders'
+    | '/planning'
+    | '/quality'
+    | '/safety-crosses'
+    | '/schedules'
+    | '/scrap'
+    | '/settings'
+    | '/smart-factory'
+    | '/stepper'
+    | '/traceability'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/analytics'
+    | '/andon'
+    | '/bi'
+    | '/bom'
+    | '/events'
+    | '/historian'
+    | '/inspections'
+    | '/instructions'
+    | '/integrations'
+    | '/inventory'
+    | '/machines'
+    | '/maintenance'
+    | '/notifications'
+    | '/operator-panel'
+    | '/operators'
+    | '/orders'
+    | '/planning'
+    | '/quality'
+    | '/safety-crosses'
+    | '/schedules'
+    | '/scrap'
+    | '/settings'
+    | '/smart-factory'
+    | '/stepper'
+    | '/traceability'
+    | '/'
+  id:
+    | '__root__'
+    | '/_dashboard'
+    | '/_dashboard/analytics'
+    | '/_dashboard/andon'
+    | '/_dashboard/bi'
+    | '/_dashboard/bom'
+    | '/_dashboard/events'
+    | '/_dashboard/historian'
+    | '/_dashboard/inspections'
+    | '/_dashboard/instructions'
+    | '/_dashboard/integrations'
+    | '/_dashboard/inventory'
+    | '/_dashboard/machines'
+    | '/_dashboard/maintenance'
+    | '/_dashboard/notifications'
+    | '/_dashboard/operator-panel'
+    | '/_dashboard/operators'
+    | '/_dashboard/orders'
+    | '/_dashboard/planning'
+    | '/_dashboard/quality'
+    | '/_dashboard/safety-crosses'
+    | '/_dashboard/schedules'
+    | '/_dashboard/scrap'
+    | '/_dashboard/settings'
+    | '/_dashboard/smart-factory'
+    | '/_dashboard/stepper'
+    | '/_dashboard/traceability'
+    | '/_dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_dashboard': {
+      id: '/_dashboard'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_dashboard/': {
+      id: '/_dashboard/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/analytics': {
+      id: '/_dashboard/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof DashboardAnalyticsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/andon': {
+      id: '/_dashboard/andon'
+      path: '/andon'
+      fullPath: '/andon'
+      preLoaderRoute: typeof DashboardAndonRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/bi': {
+      id: '/_dashboard/bi'
+      path: '/bi'
+      fullPath: '/bi'
+      preLoaderRoute: typeof DashboardBiRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/bom': {
+      id: '/_dashboard/bom'
+      path: '/bom'
+      fullPath: '/bom'
+      preLoaderRoute: typeof DashboardBomRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/events': {
+      id: '/_dashboard/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof DashboardEventsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/historian': {
+      id: '/_dashboard/historian'
+      path: '/historian'
+      fullPath: '/historian'
+      preLoaderRoute: typeof DashboardHistorianRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/inspections': {
+      id: '/_dashboard/inspections'
+      path: '/inspections'
+      fullPath: '/inspections'
+      preLoaderRoute: typeof DashboardInspectionsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/instructions': {
+      id: '/_dashboard/instructions'
+      path: '/instructions'
+      fullPath: '/instructions'
+      preLoaderRoute: typeof DashboardInstructionsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/integrations': {
+      id: '/_dashboard/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof DashboardIntegrationsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/inventory': {
+      id: '/_dashboard/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof DashboardInventoryRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/machines': {
+      id: '/_dashboard/machines'
+      path: '/machines'
+      fullPath: '/machines'
+      preLoaderRoute: typeof DashboardMachinesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/maintenance': {
+      id: '/_dashboard/maintenance'
+      path: '/maintenance'
+      fullPath: '/maintenance'
+      preLoaderRoute: typeof DashboardMaintenanceRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/notifications': {
+      id: '/_dashboard/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof DashboardNotificationsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/operator-panel': {
+      id: '/_dashboard/operator-panel'
+      path: '/operator-panel'
+      fullPath: '/operator-panel'
+      preLoaderRoute: typeof DashboardOperatorPanelRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/operators': {
+      id: '/_dashboard/operators'
+      path: '/operators'
+      fullPath: '/operators'
+      preLoaderRoute: typeof DashboardOperatorsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/orders': {
+      id: '/_dashboard/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof DashboardOrdersRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/planning': {
+      id: '/_dashboard/planning'
+      path: '/planning'
+      fullPath: '/planning'
+      preLoaderRoute: typeof DashboardPlanningRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/quality': {
+      id: '/_dashboard/quality'
+      path: '/quality'
+      fullPath: '/quality'
+      preLoaderRoute: typeof DashboardQualityRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/safety-crosses': {
+      id: '/_dashboard/safety-crosses'
+      path: '/safety-crosses'
+      fullPath: '/safety-crosses'
+      preLoaderRoute: typeof DashboardSafetyCrossesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/schedules': {
+      id: '/_dashboard/schedules'
+      path: '/schedules'
+      fullPath: '/schedules'
+      preLoaderRoute: typeof DashboardSchedulesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/scrap': {
+      id: '/_dashboard/scrap'
+      path: '/scrap'
+      fullPath: '/scrap'
+      preLoaderRoute: typeof DashboardScrapRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/settings': {
+      id: '/_dashboard/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/smart-factory': {
+      id: '/_dashboard/smart-factory'
+      path: '/smart-factory'
+      fullPath: '/smart-factory'
+      preLoaderRoute: typeof DashboardSmartFactoryRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/stepper': {
+      id: '/_dashboard/stepper'
+      path: '/stepper'
+      fullPath: '/stepper'
+      preLoaderRoute: typeof DashboardStepperRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/traceability': {
+      id: '/_dashboard/traceability'
+      path: '/traceability'
+      fullPath: '/traceability'
+      preLoaderRoute: typeof DashboardTraceabilityRouteImport
+      parentRoute: typeof DashboardRoute
     }
   }
 }
 
+interface DashboardRouteChildren {
+  DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
+  DashboardAndonRoute: typeof DashboardAndonRoute
+  DashboardBiRoute: typeof DashboardBiRoute
+  DashboardBomRoute: typeof DashboardBomRoute
+  DashboardEventsRoute: typeof DashboardEventsRoute
+  DashboardHistorianRoute: typeof DashboardHistorianRoute
+  DashboardInspectionsRoute: typeof DashboardInspectionsRoute
+  DashboardInstructionsRoute: typeof DashboardInstructionsRoute
+  DashboardIntegrationsRoute: typeof DashboardIntegrationsRoute
+  DashboardInventoryRoute: typeof DashboardInventoryRoute
+  DashboardMachinesRoute: typeof DashboardMachinesRoute
+  DashboardMaintenanceRoute: typeof DashboardMaintenanceRoute
+  DashboardNotificationsRoute: typeof DashboardNotificationsRoute
+  DashboardOperatorPanelRoute: typeof DashboardOperatorPanelRoute
+  DashboardOperatorsRoute: typeof DashboardOperatorsRoute
+  DashboardOrdersRoute: typeof DashboardOrdersRoute
+  DashboardPlanningRoute: typeof DashboardPlanningRoute
+  DashboardQualityRoute: typeof DashboardQualityRoute
+  DashboardSafetyCrossesRoute: typeof DashboardSafetyCrossesRoute
+  DashboardSchedulesRoute: typeof DashboardSchedulesRoute
+  DashboardScrapRoute: typeof DashboardScrapRoute
+  DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardSmartFactoryRoute: typeof DashboardSmartFactoryRoute
+  DashboardStepperRoute: typeof DashboardStepperRoute
+  DashboardTraceabilityRoute: typeof DashboardTraceabilityRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardAnalyticsRoute: DashboardAnalyticsRoute,
+  DashboardAndonRoute: DashboardAndonRoute,
+  DashboardBiRoute: DashboardBiRoute,
+  DashboardBomRoute: DashboardBomRoute,
+  DashboardEventsRoute: DashboardEventsRoute,
+  DashboardHistorianRoute: DashboardHistorianRoute,
+  DashboardInspectionsRoute: DashboardInspectionsRoute,
+  DashboardInstructionsRoute: DashboardInstructionsRoute,
+  DashboardIntegrationsRoute: DashboardIntegrationsRoute,
+  DashboardInventoryRoute: DashboardInventoryRoute,
+  DashboardMachinesRoute: DashboardMachinesRoute,
+  DashboardMaintenanceRoute: DashboardMaintenanceRoute,
+  DashboardNotificationsRoute: DashboardNotificationsRoute,
+  DashboardOperatorPanelRoute: DashboardOperatorPanelRoute,
+  DashboardOperatorsRoute: DashboardOperatorsRoute,
+  DashboardOrdersRoute: DashboardOrdersRoute,
+  DashboardPlanningRoute: DashboardPlanningRoute,
+  DashboardQualityRoute: DashboardQualityRoute,
+  DashboardSafetyCrossesRoute: DashboardSafetyCrossesRoute,
+  DashboardSchedulesRoute: DashboardSchedulesRoute,
+  DashboardScrapRoute: DashboardScrapRoute,
+  DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardSmartFactoryRoute: DashboardSmartFactoryRoute,
+  DashboardStepperRoute: DashboardStepperRoute,
+  DashboardTraceabilityRoute: DashboardTraceabilityRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

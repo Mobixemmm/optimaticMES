@@ -5,8 +5,8 @@ import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([ProductionOrder])],
-    controllers: [OrdersController],
-    providers: [OrdersService],
+  imports: [TypeOrmModule.forFeature([ProductionOrder])],
+  controllers: [OrdersController],
+  providers: [OrdersService],
 })
 export class OrdersModule {}

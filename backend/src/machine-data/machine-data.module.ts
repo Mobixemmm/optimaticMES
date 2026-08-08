@@ -5,8 +5,9 @@ import { MachineDataController } from './machine-data.controller';
 import { MachineDataService } from './machine-data.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([MachineData])],
-    controllers: [MachineDataController],
-    providers: [MachineDataService],
+  imports: [TypeOrmModule.forFeature([MachineData])],
+  controllers: [MachineDataController],
+  providers: [MachineDataService],
+  exports: [MachineDataService],
 })
 export class MachineDataModule {}

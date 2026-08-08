@@ -88,6 +88,99 @@
   --gradient-dark: linear-gradient(135deg, oklch(0.22 0.06 155), oklch(0.35 0.1 150));
   --shadow-card: 0 1px 2px oklch(0.2 0.05 160 / 0.04), 0 4px 20px oklch(0.2 0.05 160 / 0.04);
   --shadow-elegant: 0 10px 40px -10px oklch(0.32 0.1 155 / 0.35);
+
+  /* Paleta kategorialna wykresów — slot = tożsamość, przypisywana w stałej
+     kolejności i nigdy niezapętlana (patrz lib/analytics/palette.ts).
+     Używana już TYLKO tam, gdzie tożsamość jest naprawdę potrzebna: na stosie
+     w DayTrend i przy kropkach zdarzeń. Wykresy jednoserisowe noszą jeden
+     odcień marki (--chart-magnitude).
+
+     Kolejność slotów jest dobrana pod markę, a nie kosmetycznie:
+     slot 1 (Awaria) trzyma ciepły odcień, bo zieleń przy awarii czytałaby się
+     jako „dobrze"; slot 2 (Przezbrojenie) niesie akwę z rodziny marki.
+     Fiolet i niebieski MUSZĄ być rozdzielone — w trybie ciemnym sąsiadują na
+     ΔE 1,9 przy protanopii, czyli zlewają się zupełnie.
+
+     Zwalidowana walidatorem palet wobec realnych powierzchni kart
+     (#ffffff jasna, #0c1711 ciemna): pasmo jasności, próg chromy, separacja
+     CVD i próg dla widzenia normalnego przechodzą w OBU trybach — najgorsza
+     para sąsiadów ΔE 9,2 CVD / 27,6 przy widzeniu normalnym (jasny) i
+     9,4 / 24,6 (ciemny). W trybie jasnym akwa (2,82:1) i żółty (2,17:1) są
+     poniżej kontrastu 3:1 wobec białej karty — kanałem zastępczym są etykiety
+     bezpośrednie na stosie oraz widok tabelaryczny ChartCard.
+
+     To są odcienie DOMYŚLNE. Użytkownik może przemalować dowolny slot pod
+     siebie (LegendColorPicker), a wybór jest zapisany przy jego koncie —
+     wtedy w miejsce tokenu wchodzi jego hex i powyższa walidacja przestaje go
+     dotyczyć. Kanały zastępcze zostają, więc czytelność nie zależy od tego,
+     jak dobrze dobierze kolory. */
+  --chart-1: #eb6834;
+  --chart-2: #1baf7a;
+  --chart-3: #4a3aa7;
+  --chart-4: #eda100;
+  --chart-5: #2a78d6;
+  /* Postój planowany nie jest stratą — celowo neutralny, żeby nie konkurował
+     z kategoriami rzeczywistych przestojów. */
+  --chart-neutral: oklch(0.72 0.01 160);
+  /* Jeden odcień dla wykresów wielkości (jedna seria) — magnitude, nie tożsamość. */
+  --chart-magnitude: oklch(0.5 0.14 150);
+}
+
+.dark {
+  --background: oklch(0.14 0.015 160);
+  --foreground: oklch(0.96 0.005 100);
+
+  --card: oklch(0.19 0.02 160);
+  --card-foreground: oklch(0.96 0.005 100);
+  --popover: oklch(0.19 0.02 160);
+  --popover-foreground: oklch(0.96 0.005 100);
+
+  --primary: oklch(0.58 0.16 150);
+  --primary-foreground: oklch(0.98 0.01 150);
+  --primary-glow: oklch(0.68 0.18 150);
+
+  --secondary: oklch(0.24 0.02 160);
+  --secondary-foreground: oklch(0.92 0.01 150);
+
+  --muted: oklch(0.23 0.015 160);
+  --muted-foreground: oklch(0.65 0.02 160);
+
+  --accent: oklch(0.26 0.04 155);
+  --accent-foreground: oklch(0.95 0.02 155);
+
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
+
+  --success: oklch(0.64 0.16 150);
+  --success-foreground: oklch(0.98 0 0);
+
+  --warning: oklch(0.78 0.15 75);
+  --warning-foreground: oklch(0.15 0.05 60);
+
+  --border: oklch(0.26 0.015 160);
+  --input: oklch(0.26 0.015 160);
+  --ring: oklch(0.58 0.16 150);
+
+  --sidebar: oklch(0.16 0.02 160);
+  --sidebar-foreground: oklch(0.88 0.01 160);
+  --sidebar-accent: oklch(0.24 0.03 155);
+  --sidebar-accent-foreground: oklch(0.95 0.05 155);
+
+  --gradient-primary: linear-gradient(135deg, oklch(0.44 0.14 155), oklch(0.62 0.18 150));
+  --gradient-dark: linear-gradient(135deg, oklch(0.12 0.02 160), oklch(0.24 0.04 160));
+  --shadow-card: 0 1px 3px oklch(0 0 0 / 0.3), 0 4px 20px oklch(0 0 0 / 0.4);
+  --shadow-elegant: 0 10px 40px -10px oklch(0.58 0.16 150 / 0.45);
+
+  /* Te same osiem odcieni przestopowane pod ciemną powierzchnię karty, a nie
+     automatyczne odwrócenie jasnych wartości. Walidator: wszystkie sloty
+     w paśmie jasności i powyżej kontrastu 3:1 wobec ciemnej karty. */
+  --chart-1: #d95926;
+  --chart-2: #199e70;
+  --chart-3: #9085e9;
+  --chart-4: #c98500;
+  --chart-5: #3987e5;
+  --chart-neutral: oklch(0.45 0.01 160);
+  --chart-magnitude: oklch(0.62 0.18 150);
 }
 
 @layer base {
@@ -122,4 +215,25 @@
     transparent 2px,
     transparent 8px
   );
+}
+
+/* Custom Minimalistic Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
 }

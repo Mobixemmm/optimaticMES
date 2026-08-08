@@ -10,6 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import { APP_DESCRIPTION, APP_TITLE } from "@/lib/branding";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -77,16 +78,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ProdFlow MES — Panel produkcyjny" },
-      { name: "description", content: "Nowoczesny system MES do zarządzania produkcją, OEE, zleceniami i maszynami w czasie rzeczywistym." },
-      { property: "og:title", content: "ProdFlow MES — Panel produkcyjny" },
-      { property: "og:description", content: "Nowoczesny system MES do zarządzania produkcją, OEE, zleceniami i maszynami w czasie rzeczywistym." },
+      { title: APP_TITLE },
+      { name: "description", content: APP_DESCRIPTION },
+      { property: "og:title", content: APP_TITLE },
+      { property: "og:description", content: APP_DESCRIPTION },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "ProdFlow MES — Panel produkcyjny" },
-      { name: "twitter:description", content: "Nowoczesny system MES do zarządzania produkcją, OEE, zleceniami i maszynami w czasie rzeczywistym." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/eb569a66-6067-40c3-8143-903f089b42c4/id-preview-529db16b--0710e3be-817a-4c14-b6bc-e691e9589fa4.lovable.app-1784921435500.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/eb569a66-6067-40c3-8143-903f089b42c4/id-preview-529db16b--0710e3be-817a-4c14-b6bc-e691e9589fa4.lovable.app-1784921435500.png" },
+      { name: "twitter:title", content: APP_TITLE },
+      { name: "twitter:description", content: APP_DESCRIPTION },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/eb569a66-6067-40c3-8143-903f089b42c4/id-preview-529db16b--0710e3be-817a-4c14-b6bc-e691e9589fa4.lovable.app-1784921435500.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/eb569a66-6067-40c3-8143-903f089b42c4/id-preview-529db16b--0710e3be-817a-4c14-b6bc-e691e9589fa4.lovable.app-1784921435500.png",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

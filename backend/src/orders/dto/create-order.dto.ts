@@ -1,25 +1,35 @@
-import { IsString, IsInt, IsOptional, IsEnum } from 'class-validator';
+import { IsString, IsInt, IsNumber, IsOptional, IsEnum, Min } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateOrderDto {
-    @IsString()
-    orderNumber: string;
+  @IsString()
+  orderNumber: string;
 
-    @IsString()
-    productName: string;
+  @IsString()
+  productName: string;
 
-    @IsInt()
-    quantity: number;
+  @IsInt()
+  quantity: number;
 
-    @IsEnum(['pending', 'in_progress', 'completed', 'cancelled'])
-    @IsOptional()
-    status?: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  @ApiPropertyOptional({
+    example: 42.5,
+    description: 'Wzorcowy czas cyklu (s/szt.) — potrzebny do liczenia OEE Performance',
+  })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  idealCycleTimeSec?: number;
 
-    @IsOptional()
-    plannedStart?: Date;
+  @IsEnum(['pending', 'in_progress', 'completed', 'cancelled'])
+  @IsOptional()
+  status?: 'pending' | 'in_progress' | 'completed' | 'cancelled';
 
-    @IsOptional()
-    actualStart?: Date;
+  @IsOptional()
+  plannedStart?: Date;
 
-    @IsOptional()
-    actualEnd?: Date;
+  @IsOptional()
+  actualStart?: Date;
+
+  @IsOptional()
+  actualEnd?: Date;
 }

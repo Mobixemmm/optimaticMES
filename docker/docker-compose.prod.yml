@@ -1,0 +1,79 @@
+## Wdrożenie produkcyjne (on-prem) — baza + backend + frontend.
+## Nie zawiera reverse proxy/TLS ani pgadmin celowo: to zależy od konkretnej
+## sieci zakładowej (DNS, certyfikaty). Postaw przed tym nginx/traefik z HTTPS
+## (patrz docker/nginx.conf.example) albo firewall zakładowy — nie wystawiaj
+## portów 3000/3001 bezpośrednio do internetu.
+##
+## Użycie:
+##   1. Skopiuj docker/.env.prod.example -> docker/.env.prod i uzupełnij sekrety
+##   2. docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod up -d --build
+##   3. Jednorazowo: docker compose -f docker/docker-compose.prod.yml exec backend npm run migration:run
+
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: mes_timescaledb
+    environment:
+      POSTGRES_USER: gateway
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: machine_data
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gateway -d machine_data"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    # Brak publikacji portu na host celowo — baza dostępna tylko wewnątrz
+    # sieci Dockera (dla backendu i gatewaya OPC UA/MQTT, jeśli działa w tym samym compose).
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: mes_backend
+    environment:
+      DATABASE_HOST: timescaledb
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: gateway
+      DATABASE_PASSWORD: ${DB_PASSWORD}
+      DATABASE_NAME: machine_data
+      NODE_ENV: production
+      PORT: 3001
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: 8h
+      COOKIE_SECURE: "true"
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      SENSOR_SIMULATION: "false"
+      TZ: ${TZ:-Europe/Warsaw}
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3001/health/live', r => process.exit(r.statusCode===200?0:1)).on('error', () => process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    # Wystaw na host tylko jeśli nie masz reverse proxy w tym samym compose.
+    ports:
+      - "127.0.0.1:3001:3001"
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      args:
+        # Adres widoczny z przeglądarki operatora — NIE nazwa kontenera Dockera.
+        VITE_API_URL: ${VITE_API_URL}
+    container_name: mes_frontend
+    depends_on:
+      - backend
+    restart: unless-stopped
+    ports:
+      - "8080:3000"
+
+volumes:
+  timescale_data:
