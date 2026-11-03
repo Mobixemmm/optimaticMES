@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
 import { MachineConfig } from '../entities/machine-config.entity';
 import { Machine } from '../entities/machine.entity';
 import { currentTenantId, tenantScope } from '../common/request-context';
@@ -153,10 +153,16 @@ export class MachineConfigsService {
     );
   }
 
+  // `manager` pozwala czytać i przesuwać kursor w tej samej transakcji, w
+  // której ScrapService zapisuje zdarzenia — inaczej awaria w połowie importu
+  // zostawiała zdarzenia bez przesuniętego kursora i następny przebieg
+  // importował te same próbki drugi raz.
   async readScrapCursor(
     machineId: string,
+    manager?: EntityManager,
   ): Promise<{ value: number | null; at: Date | null }> {
-    const row = await this.configRepository.findOne({
+    const repository = manager?.getRepository(MachineConfig) ?? this.configRepository;
+    const row = await repository.findOne({
       where: { machineId, ...tenantScope() },
     });
     return {
@@ -171,11 +177,13 @@ export class MachineConfigsService {
     machineId: string,
     value: number,
     at: Date,
+    manager?: EntityManager,
   ): Promise<void> {
-    const row = await this.findOrCreateRow(machineId);
+    const repository = manager?.getRepository(MachineConfig) ?? this.configRepository;
+    const row = await this.findOrCreateRow(machineId, repository);
     row.scrapCursorValue = String(value);
     row.scrapCursorAt = at;
-    await this.configRepository.save(row);
+    await repository.save(row);
   }
 
   // --- Wewnętrzne ----------------------------------------------------------
@@ -289,14 +297,17 @@ export class MachineConfigsService {
     await this.configRepository.save(row);
   }
 
-  private async findOrCreateRow(machineId: string): Promise<MachineConfig> {
+  private async findOrCreateRow(
+    machineId: string,
+    repository: Repository<MachineConfig> = this.configRepository,
+  ): Promise<MachineConfig> {
     const tenantId = currentTenantId();
-    const existing = await this.configRepository.findOne({
+    const existing = await repository.findOne({
       where: { machineId, tenantId },
     });
     return (
       existing ??
-      this.configRepository.create({
+      repository.create({
         tenantId,
         machineId,
         panelModules: null,
