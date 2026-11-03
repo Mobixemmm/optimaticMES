@@ -1,6 +1,10 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { MachineDataService } from './machine-data.service';
+import {
+  MachineDataLatestQueryDto,
+  MachineDataLimitQueryDto,
+} from './dto/machine-data-query.dto';
 import { RequirePermission } from '../auth/permissions.decorator';
 import { PERMISSIONS } from '../auth/permissions.constants';
 
@@ -12,11 +16,8 @@ export class MachineDataController {
   @Get()
   @RequirePermission(PERMISSIONS.MACHINES_READ)
   @ApiOperation({ summary: 'Ostatnie odczyty z maszyn' })
-  async findLatest(
-    @Query('machineId') machineId?: string,
-    @Query('limit') limit?: number,
-  ) {
-    return this.machineDataService.findLatest(machineId, limit);
+  async findLatest(@Query() query: MachineDataLatestQueryDto) {
+    return this.machineDataService.findLatest(query.machineId, query.limit);
   }
 
   @Get('machines')
@@ -46,8 +47,8 @@ export class MachineDataController {
   async findByTag(
     @Param('machineId') machineId: string,
     @Param('tagName') tagName: string,
-    @Query('limit') limit?: number,
+    @Query() query: MachineDataLimitQueryDto,
   ) {
-    return this.machineDataService.findByTag(machineId, tagName, limit);
+    return this.machineDataService.findByTag(machineId, tagName, query.limit);
   }
 }

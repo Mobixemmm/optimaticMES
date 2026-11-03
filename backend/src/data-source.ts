@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
+import { join } from 'node:path';
 import { ProductionOrder } from './entities/production-order.entity';
 import { SensorData } from './entities/sensor-data.entity';
 import { Operator } from './entities/operator.entity';
@@ -67,7 +68,11 @@ export const AppDataSource = new DataSource({
     ScrapCategory,
     ScrapEvent,
   ],
-  migrations: ['src/migrations/*.ts'],
+  // Ten sam plik działa w dwóch trybach: z `src/` przez ts-node (dev,
+  // migration:run) i skompilowany z `dist/` (obraz produkcyjny bez ts-node,
+  // migration:run:prod). Rozszerzenie bierzemy z samego pliku — glob `*.ts` w
+  // dist złapałby też deklaracje `.d.ts`.
+  migrations: [join(__dirname, 'migrations', `*.${__filename.endsWith('.ts') ? 'ts' : 'js'}`)],
   synchronize: false,
   logging: false,
 });

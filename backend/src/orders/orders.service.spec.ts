@@ -53,6 +53,21 @@ describe('OrdersService', () => {
       expect(result.actualEnd).toBeUndefined();
     });
 
+    it('keeps the original actualStart when an order is started again', async () => {
+      const firstStart = new Date('2026-11-01T06:00:00Z');
+      const order = {
+        id: 1,
+        status: 'in_progress',
+        actualStart: firstStart,
+      } as ProductionOrder;
+      (repo.findOne as jest.Mock).mockResolvedValue(order);
+      (repo.save as jest.Mock).mockImplementation((o) => Promise.resolve(o));
+
+      const result = await service.updateStatus(1, 'in_progress');
+
+      expect(result.actualStart).toBe(firstStart);
+    });
+
     it('sets actualEnd when status becomes completed', async () => {
       const order = { id: 1, status: 'in_progress' } as ProductionOrder;
       (repo.findOne as jest.Mock).mockResolvedValue(order);

@@ -42,7 +42,7 @@ export class OperatorsController {
   @Post('logout/:sessionId')
   @Public()
   @ApiOperation({ summary: 'Wyloguj operatora' })
-  async logout(@Param('sessionId') sessionId: number) {
+  async logout(@Param('sessionId', ParseIntPipe) sessionId: number) {
     return this.operatorsService.logout(sessionId);
   }
 

@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { validateEnv } from './config/validate-env';
 import { LoggingInterceptor } from './logging.interceptor';
+import { DatabaseExceptionFilter } from './common/filters/database-exception.filter';
 
 async function bootstrap() {
   // Zatrzymuje start jeśli brakuje sekretów albo konfiguracja jest niebezpieczna
@@ -57,6 +58,8 @@ async function bootstrap() {
   }
 
   app.useGlobalInterceptors(new LoggingInterceptor());
+  // Naruszenia ograniczeń bazy (UNIQUE, FK) to błąd danych wejściowych → 4xx, nie 500.
+  app.useGlobalFilters(new DatabaseExceptionFilter(app.getHttpAdapter()));
   app.enableShutdownHooks();
 
   const port = parseInt(process.env.PORT || '3001', 10);

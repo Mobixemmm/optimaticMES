@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
 import { BadRequestException } from '@nestjs/common';
 import { ScrapService } from './scrap.service';
 import { ScrapEvent } from '../entities/scrap-event.entity';
@@ -8,6 +8,22 @@ import { ProductionOrder } from '../entities/production-order.entity';
 import { MachineConfigsService } from '../machine-configs/machine-configs.service';
 import { MachineDataService } from '../machine-data/machine-data.service';
 import { enterTestRequestContext } from '../common/testing/request-context.testing';
+
+// Łańcuch QueryBuildera dla atomowego UPDATE licznika braków zlecenia.
+function createUpdateBuilder() {
+  const builder = {
+    update: jest.fn(),
+    set: jest.fn(),
+    where: jest.fn(),
+    setParameter: jest.fn(),
+    execute: jest.fn().mockResolvedValue({ affected: 1 }),
+  };
+  builder.update.mockReturnValue(builder);
+  builder.set.mockReturnValue(builder);
+  builder.where.mockReturnValue(builder);
+  builder.setParameter.mockReturnValue(builder);
+  return builder;
+}
 
 function sample(time: string, value: number | null) {
   return {
@@ -24,7 +40,14 @@ describe('ScrapService', () => {
   let service: ScrapService;
   let scrapRepo: { save: jest.Mock; create: jest.Mock; find: jest.Mock; findOne: jest.Mock; remove: jest.Mock };
   let categoryRepo: { findOne: jest.Mock; find: jest.Mock; save: jest.Mock; create: jest.Mock };
-  let orderRepo: { findOne: jest.Mock; save: jest.Mock };
+  let orderRepo: {
+    findOne: jest.Mock;
+    save: jest.Mock;
+    createQueryBuilder: jest.Mock;
+  };
+  let updateBuilder: ReturnType<typeof createUpdateBuilder>;
+  let manager: { query: jest.Mock; getRepository: jest.Mock };
+  let dataSource: { transaction: jest.Mock };
   let machineConfigs: {
     getForMachine: jest.Mock;
     machinesWithTelemetryScrap: jest.Mock;
@@ -51,9 +74,28 @@ describe('ScrapService', () => {
       save: jest.fn((row: unknown) => Promise.resolve(row)),
       create: jest.fn((data: unknown) => ({ ...(data as object) })),
     };
+    updateBuilder = createUpdateBuilder();
     orderRepo = {
       findOne: jest.fn().mockResolvedValue(null),
       save: jest.fn((row: unknown) => Promise.resolve(row)),
+      createQueryBuilder: jest.fn(() => updateBuilder),
+    };
+    // Transakcja w testach wykonuje callback od razu na menedżerze, który
+    // oddaje te same mocki repozytoriów co wstrzyknięte do serwisu.
+    manager = {
+      query: jest.fn().mockResolvedValue([]),
+      getRepository: jest.fn((entity: unknown) =>
+        entity === ScrapEvent
+          ? scrapRepo
+          : entity === ProductionOrder
+            ? orderRepo
+            : {},
+      ),
+    };
+    dataSource = {
+      transaction: jest.fn(
+        (work: (m: typeof manager) => Promise<unknown>) => work(manager),
+      ),
     };
     machineConfigs = {
       getForMachine: jest.fn().mockResolvedValue({
@@ -77,6 +119,7 @@ describe('ScrapService', () => {
         { provide: getRepositoryToken(ProductionOrder), useValue: orderRepo },
         { provide: MachineConfigsService, useValue: machineConfigs },
         { provide: MachineDataService, useValue: machineData },
+        { provide: getDataSourceToken(), useValue: dataSource },
       ],
     }).compile();
 
@@ -116,15 +159,20 @@ describe('ScrapService', () => {
       expect(scrapRepo.save).not.toHaveBeenCalled();
     });
 
-    it('dopisuje braki do otwartego zlecenia na tej maszynie', async () => {
-      const order = { id: 42, scrapQuantity: 5 };
-      orderRepo.findOne.mockResolvedValue(order);
+    it('dopisuje braki do otwartego zlecenia atomowym UPDATE', async () => {
+      orderRepo.findOne.mockResolvedValue({ id: 42 });
 
       await service.report({ machineId: 'PRESS-01', quantity: 3, categoryCode: 'MATERIAL' });
 
-      expect(orderRepo.save).toHaveBeenCalledWith(
-        expect.objectContaining({ id: 42, scrapQuantity: 8 }),
+      // Bez odczyt → +delta → zapis: dwa równoległe zgłoszenia gubiły wtedy
+      // jedno z nich. Licznik zmienia sama baza.
+      expect(orderRepo.save).not.toHaveBeenCalled();
+      expect(updateBuilder.where).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ orderId: 42 }),
       );
+      expect(updateBuilder.setParameter).toHaveBeenCalledWith('delta', 3);
+      expect(updateBuilder.execute).toHaveBeenCalled();
     });
 
     it('odrzuca nieznaną kategorię', async () => {
@@ -168,7 +216,24 @@ describe('ScrapService', () => {
         'PRESS-01',
         500,
         new Date('2026-08-01T10:00:00Z'),
+        manager,
       );
+    });
+
+    it('importuje każdą maszynę w transakcji pod blokadą doradczą', async () => {
+      machineData.findByTagSince.mockResolvedValue([sample('2026-08-01T10:00:00Z', 500)]);
+
+      await service.ingestFromTelemetry();
+
+      // Równoległe odczyty /scrap/events dublowały zdarzenia — blokada per
+      // (tenant, maszyna) szereguje przebiegi, a kursor czytany jest w tej
+      // samej transakcji, w której jest przesuwany.
+      expect(dataSource.transaction).toHaveBeenCalledTimes(1);
+      expect(manager.query).toHaveBeenCalledWith(
+        expect.stringContaining('pg_advisory_xact_lock'),
+        ['scrap-ingest', expect.stringContaining('PRESS-01')],
+      );
+      expect(machineConfigs.readScrapCursor).toHaveBeenCalledWith('PRESS-01', manager);
     });
 
     it('zamienia przyrosty licznika na zdarzenia', async () => {

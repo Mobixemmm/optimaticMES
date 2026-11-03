@@ -21,6 +21,8 @@
     "migration:generate": "typeorm-ts-node-commonjs migration:generate -d src/data-source.ts",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d src/data-source.ts",
     "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/data-source.ts",
+    "migration:run:prod": "typeorm migration:run -d dist/data-source.js",
+    "migration:revert:prod": "typeorm migration:revert -d dist/data-source.js",
     "db:seed:users": "ts-node -r tsconfig-paths/register src/seed-users.ts",
     "db:seed:operators": "ts-node -r tsconfig-paths/register src/seed-operators.ts",
     "db:seed:inventory": "ts-node -r tsconfig-paths/register src/seed-inventory.ts",

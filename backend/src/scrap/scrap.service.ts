@@ -4,8 +4,8 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Repository } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { Between, DataSource, EntityManager, Repository } from 'typeorm';
 import { ScrapEvent } from '../entities/scrap-event.entity';
 import { ScrapCategory } from '../entities/scrap-category.entity';
 import { ProductionOrder } from '../entities/production-order.entity';
@@ -52,6 +52,8 @@ export class ScrapService {
     private readonly orderRepository: Repository<ProductionOrder>,
     private readonly machineConfigs: MachineConfigsService,
     private readonly machineData: MachineDataService,
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
   ) {}
 
   // --- Katalog kategorii ---------------------------------------------------
@@ -198,7 +200,34 @@ export class ScrapService {
     scrapTag: string;
     scrapDefaultCategory: string;
   }): Promise<number> {
-    const cursor = await this.machineConfigs.readScrapCursor(config.machineId);
+    // Import odpala się przy każdym odczycie /scrap/events i /scrap/summary,
+    // więc dwie karty przeglądarki (albo karta + cron) wchodzą tu równolegle.
+    // Bez blokady oba przebiegi czytały ten sam kursor i każdy zapisywał te
+    // same przyrosty — odrzut i licznik braków zlecenia rosły N-krotnie.
+    // Blokada doradcza per (tenant, maszyna) zwalnia się sama z końcem
+    // transakcji; drugi przebieg czeka, a potem widzi już przesunięty kursor.
+    return this.dataSource.transaction(async (manager) => {
+      await manager.query(
+        'SELECT pg_advisory_xact_lock(hashtext($1), hashtext($2))',
+        ['scrap-ingest', `${currentTenantId()}:${config.machineId}`],
+      );
+      return this.ingestMachineLocked(config, manager);
+    });
+  }
+
+  private async ingestMachineLocked(
+    config: {
+      machineId: string;
+      scrapTag: string;
+      scrapDefaultCategory: string;
+    },
+    manager: EntityManager,
+  ): Promise<number> {
+    const scrapRepository = manager.getRepository(ScrapEvent);
+    const cursor = await this.machineConfigs.readScrapCursor(
+      config.machineId,
+      manager,
+    );
     const samples = await this.machineData.findByTagSince(
       config.machineId,
       config.scrapTag,
@@ -234,8 +263,8 @@ export class ScrapService {
       if (delta <= 0) continue;
 
       const orderId = await this.findOpenOrderId(config.machineId);
-      await this.scrapRepository.save(
-        this.scrapRepository.create({
+      await scrapRepository.save(
+        scrapRepository.create({
           tenantId: currentTenantId(),
           machineId: config.machineId,
           orderId,
@@ -249,7 +278,7 @@ export class ScrapService {
           recordedAt: sample.time,
         }),
       );
-      await this.addToOrderScrap(orderId, delta);
+      await this.addToOrderScrap(orderId, delta, manager);
       created += 1;
     }
 
@@ -258,6 +287,7 @@ export class ScrapService {
         config.machineId,
         lastValue,
         lastTime,
+        manager,
       );
     }
     return created;
@@ -363,18 +393,26 @@ export class ScrapService {
   private async addToOrderScrap(
     orderId: number | null,
     delta: number,
+    manager?: EntityManager,
   ): Promise<void> {
     if (orderId === null || delta === 0) return;
-
-    const order = await this.orderRepository.findOne({
-      where: { id: orderId, ...tenantScope() },
-    });
-    if (!order) return;
 
     // Licznik braków na zleceniu zasila wskaźnik Jakości w OEE, więc musi
     // rosnąć razem ze zgłoszeniami — inaczej moduł SCRAP i analityka
     // pokazywałyby dwie różne prawdy o tej samej zmianie.
-    order.scrapQuantity = Math.max(0, order.scrapQuantity + Math.round(delta));
-    await this.orderRepository.save(order);
+    //
+    // Atomowy UPDATE zamiast odczyt → +delta → zapis: dwa zgłoszenia z
+    // różnych paneli w tej samej chwili nadpisywały sobie nawzajem wynik.
+    const repository = manager?.getRepository(ProductionOrder) ?? this.orderRepository;
+    await repository
+      .createQueryBuilder()
+      .update(ProductionOrder)
+      .set({ scrapQuantity: () => 'GREATEST(0, "scrapQuantity" + :delta)' })
+      .where('id = :orderId AND tenant_id = :tenantId', {
+        orderId,
+        tenantId: currentTenantId(),
+      })
+      .setParameter('delta', Math.round(delta))
+      .execute();
   }
 }

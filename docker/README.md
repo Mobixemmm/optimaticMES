@@ -15,7 +15,7 @@ cp docker/.env.prod.example docker/.env.prod   # uzupełnij sekrety
 docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod up -d --build
 
 # jednorazowo po pierwszym starcie (i po każdej nowej migracji):
-docker compose -f docker/docker-compose.prod.yml exec backend npm run migration:run
+docker compose -f docker/docker-compose.prod.yml exec backend npm run migration:run:prod
 ```
 
 Buduje i uruchamia timescaledb + backend + frontend. **Nie zawiera** reverse proxy
