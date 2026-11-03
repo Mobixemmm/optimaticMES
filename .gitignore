@@ -29,3 +29,17 @@ npm-debug.log*
 
 # Docker volumes
 docker/postgres_data/
+# Test coverage
+coverage/
+backend/coverage/
+
+# Environment (any variant except examples)
+.env
+.env.*
+!.env.example
+**/.env.*
+!**/.env.example
+
+# Frontend build caches
+frontend/.tanstack/
+frontend/.vinxi/
