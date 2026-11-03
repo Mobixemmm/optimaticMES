@@ -12,6 +12,7 @@ import {
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { UpdateOrderProgressDto } from './dto/update-order-progress.dto';
 import { ProductionOrder } from '../entities/production-order.entity';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
@@ -54,9 +55,9 @@ export class OrdersController {
   @ApiOperation({ summary: 'Zmień status zlecenia' })
   async updateStatus(
     @Param('id', ParseIntPipe) id: number,
-    @Body('status') status: string,
+    @Body() dto: UpdateOrderStatusDto,
   ): Promise<ProductionOrder> {
-    return this.ordersService.updateStatus(id, status);
+    return this.ordersService.updateStatus(id, dto.status);
   }
 
   @Patch(':id/progress')

@@ -47,11 +47,16 @@ export class OrdersService {
     return this.orderRepository.save(order);
   }
 
-  async updateStatus(id: number, status: string): Promise<ProductionOrder> {
+  async updateStatus(
+    id: number,
+    status: ProductionOrder['status'],
+  ): Promise<ProductionOrder> {
     const order = await this.findOne(id);
-    order.status = status as ProductionOrder['status'];
+    order.status = status;
 
-    if (status === 'in_progress') {
+    // Ponowne kliknięcie "Start" (albo wznowienie po pauzie) nie może przesuwać
+    // faktycznego startu — od niego liczy się czas pracy i OEE zlecenia.
+    if (status === 'in_progress' && !order.actualStart) {
       order.actualStart = new Date();
     } else if (status === 'completed') {
       order.actualEnd = new Date();
