@@ -7,7 +7,7 @@
 ## Użycie:
 ##   1. Skopiuj docker/.env.prod.example -> docker/.env.prod i uzupełnij sekrety
 ##   2. docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod up -d --build
-##   3. Jednorazowo: docker compose -f docker/docker-compose.prod.yml exec backend npm run migration:run
+##   3. Jednorazowo: docker compose -f docker/docker-compose.prod.yml exec backend npm run migration:run:prod
 
 services:
   timescaledb:
