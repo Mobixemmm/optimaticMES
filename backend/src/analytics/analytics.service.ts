@@ -29,6 +29,12 @@ function minutesBetween(a: Date, b: Date): number {
   return Math.max(0, (b.getTime() - a.getTime()) / 60000);
 }
 
+function localDateKey(d: Date): string {
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${mm}-${dd}`;
+}
+
 function startOfDay(d: Date): Date {
   const copy = new Date(d);
   copy.setHours(0, 0, 0, 0);
@@ -210,7 +216,10 @@ export class AnalyticsService {
       );
       const dayPlannedMinutes = Math.max(1, machineCount * dayPlannedMinutesPerMachine);
       dailyAvailability.push({
-        date: dayStart.toISOString().slice(0, 10),
+        // Data dnia w strefie serwera (TZ), nie w UTC — toISOString() dla
+        // północy w Europe/Warsaw daje poprzedni dzień i wykres pokazywał
+        // dostępność pod etykietą dnia wcześniejszego.
+        date: localDateKey(dayStart),
         pct:
           Math.round(clamp01(1 - dayDowntime / dayPlannedMinutes) * 1000) / 10,
       });
