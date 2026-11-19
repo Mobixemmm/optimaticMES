@@ -28,7 +28,8 @@
     "db:seed:andon": "ts-node -r tsconfig-paths/register src/seed-andon.ts",
     "db:seed:machine-stops": "ts-node -r tsconfig-paths/register src/seed-machine-stops.ts",
     "db:seed:order-progress": "ts-node -r tsconfig-paths/register src/seed-order-progress.ts",
-    "db:seed:all": "npm run db:seed:users && npm run db:seed:operators && npm run db:seed:inventory && npm run db:seed:maintenance && npm run db:seed:andon && npm run db:seed:machine-stops && npm run db:seed:order-progress"
+    "db:seed:availability-history": "ts-node -r tsconfig-paths/register src/seed-machine-availability-history.ts",
+    "db:seed:all": "npm run db:seed:users && npm run db:seed:operators && npm run db:seed:inventory && npm run db:seed:maintenance && npm run db:seed:andon && npm run db:seed:machine-stops && npm run db:seed:availability-history && npm run db:seed:order-progress"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
