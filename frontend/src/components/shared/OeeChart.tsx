@@ -17,7 +17,7 @@ export function OeeChart({
           <p className="text-xs text-muted-foreground">{subtitle}</p>
         </div>
       </div>
-      <div className="mt-8 flex h-64 items-end justify-between gap-2">
+      <div className="mt-8 flex h-64 justify-between gap-2">
         {data.map((b, i) => {
           const isHigh = i === data.length - 1;
           const label = new Date(b.date).toLocaleDateString("pl-PL", {
@@ -25,7 +25,7 @@ export function OeeChart({
           });
           return (
             <div key={b.date} className="flex flex-1 flex-col items-center gap-3">
-              <div className="relative flex h-full w-full max-w-[64px] items-end">
+              <div className="relative flex min-h-0 w-full max-w-[64px] flex-1 items-end">
                 {isHigh && (
                   <div className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full rounded-lg bg-foreground px-2 py-1 text-[10px] font-semibold text-background whitespace-nowrap">
                     {b.pct}%
